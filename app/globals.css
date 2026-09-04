@@ -1,0 +1,227 @@
+/* =========================================================
+   ELBIL VS. BENZINBIL — ELEGANTE MØRKT MOBIL TEMA
+   ========================================================= */
+
+:root {
+  --bg-main: #0a0e17;
+  --bg-surface: #111827;
+  --bg-card: #162032;
+  --bg-card-hover: #1e2b42;
+  --bg-card-subtle: rgba(255, 255, 255, 0.03);
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(255, 255, 255, 0.2);
+  
+  /* Elbil (Emerald / Mint / Cyan) */
+  --ev-primary: #10b981;
+  --ev-secondary: #059669;
+  --ev-glow: rgba(16, 185, 129, 0.2);
+  --ev-border: rgba(16, 185, 129, 0.35);
+  --ev-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  
+  /* Benzinbil (Crimson / Coral / Amber) */
+  --petrol-primary: #f43f5e;
+  --petrol-secondary: #e11d48;
+  --petrol-glow: rgba(244, 63, 94, 0.2);
+  --petrol-border: rgba(244, 63, 94, 0.35);
+  --petrol-gradient: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+  
+  /* Tekst & Accents */
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100%;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  padding-bottom: 90px; /* Plads til sticky verdict bar på mobil */
+}
+
+/* Mobil Wrapper (Centreret app-frame på desktop, 100% på mobil) */
+.mobile-app-container {
+  width: 100%;
+  max-width: 540px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--bg-main);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.7);
+}
+
+/* Glassmorphism Card */
+.premium-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.premium-card:active {
+  transform: scale(0.995);
+}
+
+/* Segmented Control / Pill tabs */
+.segmented-control {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  border: 1px solid var(--border-subtle);
+  gap: 4px;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.segmented-btn.active-ev {
+  background: var(--ev-gradient);
+  color: white;
+  box-shadow: 0 4px 14px var(--ev-glow);
+}
+
+.segmented-btn.active-petrol {
+  background: var(--petrol-gradient);
+  color: white;
+  box-shadow: 0 4px 14px var(--petrol-glow);
+}
+
+/* Ergonomiske Sliders */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: background 0.2s;
+  cursor: pointer;
+  margin: 12px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+  cursor: grabbing;
+}
+
+/* Elbil variant thumb */
+input[type="range"].slider-ev::-webkit-slider-thumb {
+  border: 3px solid var(--ev-primary);
+}
+
+/* Benzin variant thumb */
+input[type="range"].slider-petrol::-webkit-slider-thumb {
+  border: 3px solid var(--petrol-primary);
+}
+
+/* Tal-input med fin haptisk boks */
+.input-number-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: right;
+  width: 110px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-number-box:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Sticky Bottom Verdict Bar */
+.sticky-verdict-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  background: rgba(17, 24, 39, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid var(--border-subtle);
+  padding: 12px 20px 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Pulserende live-prik */
+.live-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulseLive 2s infinite;
+}
+
+@keyframes pulseLive {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 14px #10b981; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
