@@ -11,24 +11,32 @@ export default function SmartChargingAdvisor({ hours = [], hasRefund = true, onT
   const currentHourObj = hours.find(h => h.isCurrent) || hours[0];
   const currentPrice = currentHourObj?.consumerPriceHome || 1.35;
 
-  // 2. Find de 4 billigste timer i døgnet
-  const sortedByPrice = [...hours].sort((a, b) => a.consumerPriceHome - b.consumerPriceHome);
-  const cheapest4 = sortedByPrice.slice(0, 4);
-  const cheapestHoursNumbers = cheapest4.map(h => h.hourNumber).sort((a, b) => a - b);
-  
-  // Find billigste vindue start og slut
-  const minHourNum = Math.min(...cheapestHoursNumbers);
-  const maxHourNum = Math.max(...cheapestHoursNumbers);
-  const formatHourStr = (num) => `${num < 10 ? '0' + num : num}:00`;
-  
-  // Start- og sluttid for det primære billigste tidsrum
-  const windowStart = formatHourStr(minHourNum);
-  const windowEnd = formatHourStr((maxHourNum + 1) % 24);
+  // 2. Find den bedste sammenhængende 4-timers ladeblok (standard for 11 kW hjemmeladning af ~45 kWh)
+  const WINDOW_SIZE = 4;
+  let bestWindowStartIdx = 0;
+  let lowestWindowAvg = Infinity;
 
-  // Gennemsnitspris i det billigste vindue
-  const avgCheapestPrice = cheapest4.reduce((sum, h) => sum + h.consumerPriceHome, 0) / cheapest4.length;
-  
-  // Højeste pris i døgnet (spidstime)
+  for (let i = 0; i <= hours.length - WINDOW_SIZE; i++) {
+    let sum = 0;
+    for (let j = 0; j < WINDOW_SIZE; j++) {
+      sum += hours[i + j].consumerPriceHome;
+    }
+    const avg = sum / WINDOW_SIZE;
+    if (avg < lowestWindowAvg) {
+      lowestWindowAvg = avg;
+      bestWindowStartIdx = i;
+    }
+  }
+
+  const startHourObj = hours[bestWindowStartIdx];
+  const endHourObj = hours[bestWindowStartIdx + WINDOW_SIZE] || hours[hours.length - 1];
+  const windowStart = startHourObj?.hour || '01:00';
+  const windowEnd = endHourObj?.hour || '05:00';
+  const avgCheapestPrice = Number(lowestWindowAvg.toFixed(2));
+
+  // 3. Find absolut laveste og højeste enkelttimer
+  const sortedByPrice = [...hours].sort((a, b) => a.consumerPriceHome - b.consumerPriceHome);
+  const absoluteLowest = sortedByPrice[0];
   const maxPriceObj = sortedByPrice[sortedByPrice.length - 1];
   const peakPrice = maxPriceObj?.consumerPriceHome || 2.45;
 
@@ -38,19 +46,23 @@ export default function SmartChargingAdvisor({ hours = [], hasRefund = true, onT
   const savingPerCharge = costPeak50kWh - costCheap50kWh;
 
   // Vurdering af den aktuelle time
-  const isCurrentlyCheapest = cheapest4.some(h => h.hourNumber === currentHourObj?.hourNumber);
+  const isCurrentlyInWindow = (
+    currentHourObj?.hourNumber >= startHourObj?.hourNumber && 
+    currentHourObj?.hourNumber < (startHourObj?.hourNumber + WINDOW_SIZE)
+  );
+  const isCurrentlyLowest = currentHourObj?.hourNumber === absoluteLowest?.hourNumber;
   const isCurrentlyPeak = currentHourObj?.hourNumber >= 17 && currentHourObj?.hourNumber <= 21;
 
   let statusBadge = {
     title: 'Moderat elpris lige nu',
-    desc: `Det er billigst at lade i nat (${windowStart} - ${windowEnd}).`,
+    desc: `Det er billigst at sætte laderen til kl. ${windowStart} – ${windowEnd}.`,
     color: '#38bdf8',
     bg: 'rgba(56, 189, 248, 0.12)',
     border: 'rgba(56, 189, 248, 0.3)',
     icon: Clock
   };
 
-  if (isCurrentlyCheapest) {
+  if (isCurrentlyInWindow || isCurrentlyLowest) {
     statusBadge = {
       title: 'Perfekt tidspunkt at lade nu!',
       desc: 'Elprisen er i det billigste interval lige nu.',

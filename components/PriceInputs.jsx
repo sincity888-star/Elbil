@@ -168,30 +168,6 @@ export default function PriceInputs({
             }} />
           </div>
         </div>
-
-        {/* Vis/skjul 24t Døgnkurve Toggle Knap */}
-        <button
-          onClick={onToggleHourlyChart}
-          style={{
-            width: '100%',
-            background: 'transparent',
-            border: '1px dashed var(--border-subtle)',
-            borderRadius: '10px',
-            padding: '8px',
-            color: 'var(--text-muted)',
-            fontSize: '0.8rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            marginTop: '6px'
-          }}
-        >
-          <span>{showHourlyChart ? 'Skjul 24-timers timepris graf' : 'Se timepriser for det næste døgn (DK1)'}</span>
-          {showHourlyChart ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </button>
       </div>
 
     </div>
