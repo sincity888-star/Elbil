@@ -2,19 +2,18 @@
 
 /**
  * Beregner den samlede forbrugerpris for 1 kWh i Danmark (Vest / DK1)
+ * Statens elafgift er sænket til EU-minimumssats på 1 øre/kWh (0,01 kr.).
+ * Derfor er der intet behov for elafgiftsrefusion.
  * @param {number} spotPriceKwh - Rå spotpris i kr./kWh (f.eks. 0.75)
- * @param {number} netTariffKwh - Nettarif, systemtarif og afgifter i kr./kWh (f.eks. 1.12)
- * @param {boolean} hasRefund - Om brugeren har elafgiftsrefusion via ladeabonnement (typisk -0.95 kr)
- * @param {number} taxRefundKwh - Refusionssats pr. kWh (f.eks. 0.95)
+ * @param {number} netTariffKwh - Netselskabets transport- og nettarif i kr./kWh (f.eks. 0.50)
+ * @param {number} stateTaxKwh - Statens elafgift i kr./kWh (0.01 kr.)
  */
-export function calculateHomeElectricityPrice(spotPriceKwh, netTariffKwh = 1.12, hasRefund = true, taxRefundKwh = 0.95) {
-  // Rå pris før moms
-  const basePrice = Math.max(0, spotPriceKwh) + netTariffKwh;
+export function calculateHomeElectricityPrice(spotPriceKwh, netTariffKwh = 0.50, stateTaxKwh = 0.01) {
+  // Rå spotpris + transporttarif + 1 øre elafgift
+  const basePrice = Math.max(0, spotPriceKwh) + netTariffKwh + stateTaxKwh;
   // Pris inkl. 25% moms
   const priceWithVat = basePrice * 1.25;
-  // Fratræk refusion hvis aktiv
-  const finalPrice = hasRefund ? Math.max(0.40, priceWithVat - taxRefundKwh) : priceWithVat;
-  return Number(finalPrice.toFixed(2));
+  return Number(priceWithVat.toFixed(2));
 }
 
 /**

@@ -70,7 +70,6 @@ export default function Home() {
   const [spotPriceDk1, setSpotPriceDk1] = useState(DEFAULT_STANDARDS.defaultSpotPriceDk1Kwh);
   const [hourlyData, setHourlyData] = useState([]);
   const [isLiveLoading, setIsLiveLoading] = useState(true);
-  const [hasRefund, setHasRefund] = useState(true); // Standard: ja, ladeabonnement med refusion
   const [homeSharePercent, setHomeSharePercent] = useState(DEFAULT_STANDARDS.homeChargingPercent);
   const [showHourlyChart, setShowHourlyChart] = useState(false);
   const [showBreakevenModal, setShowBreakevenModal] = useState(false);
@@ -206,8 +205,7 @@ export default function Home() {
   const homeElectricityPrice = calculateHomeElectricityPrice(
     spotPriceDk1,
     DEFAULT_STANDARDS.netTariffKwh,
-    hasRefund,
-    DEFAULT_STANDARDS.taxRefundKwh
+    DEFAULT_STANDARDS.stateTaxKwh
   );
 
   const effectiveKwhPrice = calculateEffectiveElectricityPrice({
@@ -273,13 +271,13 @@ export default function Home() {
         onUpdateCustomPetrol={handleUpdateCustomPetrol}
       />
 
-      {/* 4. Årlig Kørsel (km) */}
+      {/* 5. Årlig Kørsel (km) */}
       <DrivingInputs 
         annualKm={annualKm} 
         onChangeKm={setAnnualKm} 
       />
 
-      {/* 5. Forbrug: km/kWh og km/l */}
+      {/* 6. Forbrug: km/kWh og km/l */}
       <EnergyInputs
         kmPerKwh={kmPerKwh}
         onChangeKmPerKwh={setKmPerKwh}
@@ -289,7 +287,7 @@ export default function Home() {
         petrolName={currentPetrol.name}
       />
 
-      {/* 6. Priser: Benzin & Live DK1 Elpris med refusion */}
+      {/* 7. Priser: Benzin & Live DK1 Elpris */}
       <PriceInputs
         petrolPrice={petrolPrice}
         onChangePetrolPrice={handlePetrolPriceChange}
@@ -299,24 +297,19 @@ export default function Home() {
         spotPriceDk1={spotPriceDk1}
         homePriceKwh={homeElectricityPrice}
         effectiveKwhPrice={effectiveKwhPrice}
-        hasRefund={hasRefund}
-        onToggleRefund={() => setHasRefund(!hasRefund)}
         homeSharePercent={homeSharePercent}
         onChangeHomeSharePercent={setHomeSharePercent}
-        showHourlyChart={showHourlyChart}
-        onToggleHourlyChart={() => setShowHourlyChart(!showHourlyChart)}
         isLiveLoading={isLiveLoading}
       />
 
-      {/* 7. Smart Ladeanbefaling: Hvornår er det billigst at lade */}
+      {/* 8. Smart Ladeanbefaling: Hvornår er det billigst at lade */}
       <SmartChargingAdvisor
         hours={hourlyData}
-        hasRefund={hasRefund}
         onToggleChart={() => setShowHourlyChart(prev => !prev)}
         isChartOpen={showHourlyChart}
       />
 
-      {/* 8. 24-timers elpris graf (fold-ud) */}
+      {/* 9. 24-timers elpris graf (fold-ud) */}
       {showHourlyChart && (
         <HourlyPriceChart hours={hourlyData} />
       )}

@@ -15,12 +15,8 @@ export default function PriceInputs({
   spotPriceDk1,
   homePriceKwh,
   effectiveKwhPrice,
-  hasRefund,
-  onToggleRefund,
   homeSharePercent,
   onChangeHomeSharePercent,
-  showHourlyChart,
-  onToggleHourlyChart,
   isLiveLoading
 }) {
   const [showTariffDetails, setShowTariffDetails] = useState(false);
@@ -129,43 +125,28 @@ export default function PriceInputs({
           </div>
         </div>
 
-        {/* Ladeabonnement & Refusion Switch */}
-        <div 
-          onClick={onToggleRefund}
-          style={{
-            background: hasRefund ? 'rgba(16, 185, 129, 0.08)' : 'rgba(0,0,0,0.25)',
-            border: '1px solid ' + (hasRefund ? 'rgba(16, 185, 129, 0.25)' : 'var(--border-subtle)'),
-            borderRadius: 'var(--radius-md)',
-            padding: '10px 12px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            cursor: 'pointer',
-            margin: '8px 0'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldCheck size={18} color={hasRefund ? '#10b981' : '#6b7280'} />
-            <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: '600', color: hasRefund ? '#ffffff' : 'var(--text-muted)' }}>
-                Elafgiftsrefusion ved hjemmeladning
-              </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-                F.eks. Clever, Monta, OK, Spirii (-0,95 kr./kWh)
-              </div>
+        {/* Statens Elafgift: 1 øre/kWh (EU-minimum) */}
+        <div style={{
+          background: 'rgba(16, 185, 129, 0.08)',
+          border: '1px solid rgba(16, 185, 129, 0.25)',
+          borderRadius: 'var(--radius-md)',
+          padding: '10px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          margin: '8px 0'
+        }}>
+          <ShieldCheck size={20} color="#10b981" style={{ flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>Statens Elafgift: 1 øre/kWh</span>
+              <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.25)', color: '#34d399', fontWeight: '800' }}>
+                EU-Minimum
+              </span>
             </div>
-          </div>
-
-          <div style={{
-            width: '40px', height: '22px', borderRadius: '12px',
-            background: hasRefund ? 'var(--ev-primary)' : '#374151',
-            position: 'relative', transition: 'background 0.2s ease'
-          }}>
-            <div style={{
-              width: '18px', height: '18px', borderRadius: '50%', background: 'white',
-              position: 'absolute', top: '2px', left: hasRefund ? '20px' : '2px',
-              transition: 'left 0.2s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.4)'
-            }} />
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Statens elafgift er sænket til 1 øre. Du betaler nu udelukkende rå spotpris + netselskabets transport og moms – intet behov for ladeabonnement eller refusionsordning.
+            </div>
           </div>
         </div>
       </div>

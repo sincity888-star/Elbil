@@ -49,8 +49,8 @@ export async function GET() {
           const hourNum = date.getHours();
           const spotKwh = Number((r.SpotPriceDKK / 1000).toFixed(3));
           
-          // Beregn forbrugerpris inkl. standard nettarif (1.12 kr.) og moms (25%), fratrukket refusion (0.95 kr.)
-          const consumerPriceHome = Number((Math.max(0.40, (spotKwh + 1.12) * 1.25 - 0.95)).toFixed(2));
+          // Beregn forbrugerpris inkl. netselskabstarif (~0.50 kr.), statens elafgift på 1 øre (0.01 kr.) og moms (25%)
+          const consumerPriceHome = Number(((spotKwh + 0.51) * 1.25).toFixed(2));
 
           return {
             hour: hourLabel,
@@ -91,7 +91,7 @@ export async function GET() {
   // Fallback data
   const hours = FALLBACK_DK1_HOURS.map((h, i) => {
     const spotKwh = h.spot;
-    const consumerPriceHome = Number((Math.max(0.40, (spotKwh + 1.12) * 1.25 - 0.95)).toFixed(2));
+    const consumerPriceHome = Number(((spotKwh + 0.51) * 1.25).toFixed(2));
     return {
       hour: h.hour,
       hourNumber: i,

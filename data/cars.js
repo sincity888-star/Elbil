@@ -372,11 +372,13 @@ export const DEFAULT_STANDARDS = {
   // Dansk Elpris Defaults:
   // Spotpris DK1 (Vestdanmark) baseret på typisk gennemsnit
   defaultSpotPriceDk1Kwh: 0.75, // kr. rå spotpris
-  netTariffKwh: 1.12,          // Transport, systemtarif, nettarif & grønne bidrag
-  momsRate: 0.25,               // 25% moms
   
-  // El-refusion for hjemmeladning i Danmark (typisk ~0.94 - 1.10 kr./kWh gennem ladeoperatør som Clever/Monta/OK)
-  taxRefundKwh: 0.95,
+  // Statens elafgift er sænket til EU-minimum: 1 øre/kWh (0,01 kr.)
+  stateTaxKwh: 0.01,
+  
+  // Netselskabernes transporttarif (transport, systemtarif & nettarif i DK1): typisk ~0,50 kr./kWh
+  netTariffKwh: 0.50,
+  momsRate: 0.25, // 25% moms
   
   // Forventet andel af hjemmeladning vs. offentlig lynlader
   homeChargingPercent: 85,
