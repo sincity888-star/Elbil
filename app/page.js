@@ -6,6 +6,7 @@ import ModelSelector from '../components/ModelSelector';
 import DrivingInputs from '../components/DrivingInputs';
 import EnergyInputs from '../components/EnergyInputs';
 import PriceInputs from '../components/PriceInputs';
+import SmartChargingAdvisor from '../components/SmartChargingAdvisor';
 import HourlyPriceChart from '../components/HourlyPriceChart';
 import VerdictCard from '../components/VerdictCard';
 import TcoBreakdown from '../components/TcoBreakdown';
@@ -263,7 +264,15 @@ export default function Home() {
         isLiveLoading={isLiveLoading}
       />
 
-      {/* 7. 24-timers elpris graf (fold-ud) */}
+      {/* 7. Smart Ladeanbefaling: Hvornår er det billigst at lade */}
+      <SmartChargingAdvisor
+        hours={hourlyData}
+        hasRefund={hasRefund}
+        onToggleChart={() => setShowHourlyChart(prev => !prev)}
+        isChartOpen={showHourlyChart}
+      />
+
+      {/* 8. 24-timers elpris graf (fold-ud) */}
       {showHourlyChart && (
         <HourlyPriceChart hours={hourlyData} />
       )}
