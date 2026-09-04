@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ModelSelector from '../components/ModelSelector';
+import LicensePlateLookup from '../components/LicensePlateLookup';
 import DrivingInputs from '../components/DrivingInputs';
 import EnergyInputs from '../components/EnergyInputs';
 import PriceInputs from '../components/PriceInputs';
@@ -160,6 +161,43 @@ export default function Home() {
     setIsPetrolManual(false);
   };
 
+  // Når brugeren slår en bil op via nummerplade
+  const handleApplyCarFromPlate = (car) => {
+    if (car.type === 'ev') {
+      setActiveTab('ev');
+      setIsCustomEv(true);
+      setCustomEv({
+        id: `plate_${car.plate}`,
+        name: car.name,
+        type: 'ev',
+        price: car.price,
+        kmPerKwh: car.kmPerKwh || 5.8,
+        halfYearTax: car.halfYearTax || 420,
+        annualService: car.annualService || 2000,
+        insuranceYear: car.insuranceYear || 7000,
+        icon: car.icon || '⚡',
+        badge: car.plate
+      });
+      setKmPerKwh(car.kmPerKwh || 5.8);
+    } else {
+      setActiveTab('petrol');
+      setIsCustomPetrol(true);
+      setCustomPetrol({
+        id: `plate_${car.plate}`,
+        name: car.name,
+        type: 'petrol',
+        price: car.price,
+        kmPerLitre: car.kmPerLitre || 18.0,
+        halfYearTax: car.halfYearTax || 680,
+        annualService: car.annualService || 4200,
+        insuranceYear: car.insuranceYear || 6500,
+        icon: car.icon || '⛽',
+        badge: car.plate
+      });
+      setKmPerLitre(car.kmPerLitre || 18.0);
+    }
+  };
+
   // Nuværende valgte biler (enten forudindstillet eller egen tilpasset bil)
   const currentEv = isCustomEv ? customEv : selectedEv;
   const currentPetrol = isCustomPetrol ? customPetrol : selectedPetrol;
@@ -211,7 +249,13 @@ export default function Home() {
         onOpenBreakeven={() => setShowBreakevenModal(true)}
       />
 
-      {/* 3. Bilvælger (Populære modeller + tilpasning) */}
+      {/* 3. Nummerpladeopslag i Motorregistret */}
+      <LicensePlateLookup 
+        onApplyCar={handleApplyCarFromPlate} 
+        activeTab={activeTab} 
+      />
+
+      {/* 4. Bilvælger (Populære modeller + live søgning & dropdown) */}
       <ModelSelector
         selectedEv={selectedEv}
         onSelectEv={handleSelectEv}
