@@ -15,7 +15,11 @@ export default function ModelSelector({
   isCustomEv,
   onToggleCustomEv,
   isCustomPetrol,
-  onToggleCustomPetrol
+  onToggleCustomPetrol,
+  customEv,
+  onUpdateCustomEv,
+  customPetrol,
+  onUpdateCustomPetrol
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '0 16px' }}>
@@ -185,6 +189,254 @@ export default function ModelSelector({
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Car Inline Editor when Custom Mode is Enabled */}
+      {activeTab === 'ev' && isCustomEv && (
+        <div style={{
+          background: 'rgba(16, 185, 129, 0.08)',
+          border: '1px solid var(--ev-primary)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          animation: 'fadeIn 0.2s ease-in-out'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sliders size={18} color="#34d399" />
+            <span style={{ fontWeight: '700', fontSize: '0.95rem', color: '#ffffff' }}>
+              Tilpas din egen elbil
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Bilens modelnavn
+              </label>
+              <input
+                type="text"
+                value={customEv.name}
+                onChange={(e) => onUpdateCustomEv({ ...customEv, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+                placeholder="F.eks. Tesla Model 3"
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Købspris (kr.)
+              </label>
+              <input
+                type="number"
+                value={customEv.price}
+                onChange={(e) => onUpdateCustomEv({ ...customEv, price: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Grøn ejerafgift (kr./halvår)
+              </label>
+              <input
+                type="number"
+                value={customEv.halfYearTax}
+                onChange={(e) => onUpdateCustomEv({ ...customEv, halfYearTax: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Årlig kaskoforsikring (kr./år)
+              </label>
+              <input
+                type="number"
+                value={customEv.insuranceYear}
+                onChange={(e) => onUpdateCustomEv({ ...customEv, insuranceYear: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Årlig service & dæk (kr./år)
+              </label>
+              <input
+                type="number"
+                value={customEv.annualService}
+                onChange={(e) => onUpdateCustomEv({ ...customEv, annualService: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Petrol Inline Editor when Custom Mode is Enabled */}
+      {activeTab === 'petrol' && isCustomPetrol && (
+        <div style={{
+          background: 'rgba(244, 63, 94, 0.08)',
+          border: '1px solid var(--petrol-primary)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          animation: 'fadeIn 0.2s ease-in-out'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sliders size={18} color="#fb7185" />
+            <span style={{ fontWeight: '700', fontSize: '0.95rem', color: '#ffffff' }}>
+              Tilpas din egen benzinbil
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Bilens modelnavn
+              </label>
+              <input
+                type="text"
+                value={customPetrol.name}
+                onChange={(e) => onUpdateCustomPetrol({ ...customPetrol, name: e.target.value })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+                placeholder="F.eks. Ford Focus"
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Købspris (kr.)
+              </label>
+              <input
+                type="number"
+                value={customPetrol.price}
+                onChange={(e) => onUpdateCustomPetrol({ ...customPetrol, price: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Grøn ejerafgift (kr./halvår)
+              </label>
+              <input
+                type="number"
+                value={customPetrol.halfYearTax}
+                onChange={(e) => onUpdateCustomPetrol({ ...customPetrol, halfYearTax: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Årlig kaskoforsikring (kr./år)
+              </label>
+              <input
+                type="number"
+                value={customPetrol.insuranceYear}
+                onChange={(e) => onUpdateCustomPetrol({ ...customPetrol, insuranceYear: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                Årlig service & reparation (kr./år)
+              </label>
+              <input
+                type="number"
+                value={customPetrol.annualService}
+                onChange={(e) => onUpdateCustomPetrol({ ...customPetrol, annualService: Number(e.target.value) || 0 })}
+                style={{
+                  width: '100%',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem'
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

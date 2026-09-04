@@ -28,6 +28,34 @@ export default function Home() {
   const [isCustomEv, setIsCustomEv] = useState(false);
   const [isCustomPetrol, setIsCustomPetrol] = useState(false);
 
+  // Egen elbil konfiguration
+  const [customEv, setCustomEv] = useState({
+    id: 'custom_ev',
+    name: 'Min egen elbil',
+    type: 'ev',
+    price: 320000,
+    kmPerKwh: 5.8,
+    halfYearTax: 420,
+    annualService: 1800,
+    insuranceYear: 7000,
+    icon: '⚡',
+    badge: 'Egen elbil'
+  });
+
+  // Egen benzinbil konfiguration
+  const [customPetrol, setCustomPetrol] = useState({
+    id: 'custom_petrol',
+    name: 'Min egen benzinbil',
+    type: 'petrol',
+    price: 280000,
+    kmPerLitre: 16.5,
+    halfYearTax: 780,
+    annualService: 4500,
+    insuranceYear: 6500,
+    icon: '⛽',
+    badge: 'Egen benzinbil'
+  });
+
   // 2. Kørsel & Forbrug (brugeren kan taste frit)
   const [annualKm, setAnnualKm] = useState(DEFAULT_STANDARDS.annualKm);
   const [kmPerKwh, setKmPerKwh] = useState(PRESET_EV_CARS[0].kmPerKwh);
@@ -84,11 +112,41 @@ export default function Home() {
   };
 
   const handleToggleCustomEv = () => {
-    setIsCustomEv(prev => !prev);
+    setIsCustomEv(prev => {
+      const next = !prev;
+      if (next) {
+        setKmPerKwh(customEv.kmPerKwh);
+      } else {
+        setKmPerKwh(selectedEv.kmPerKwh);
+      }
+      return next;
+    });
   };
 
   const handleToggleCustomPetrol = () => {
-    setIsCustomPetrol(prev => !prev);
+    setIsCustomPetrol(prev => {
+      const next = !prev;
+      if (next) {
+        setKmPerLitre(customPetrol.kmPerLitre);
+      } else {
+        setKmPerLitre(selectedPetrol.kmPerLitre);
+      }
+      return next;
+    });
+  };
+
+  const handleUpdateCustomEv = (updated) => {
+    setCustomEv(updated);
+    if (updated.kmPerKwh !== undefined && updated.kmPerKwh !== kmPerKwh) {
+      setKmPerKwh(updated.kmPerKwh);
+    }
+  };
+
+  const handleUpdateCustomPetrol = (updated) => {
+    setCustomPetrol(updated);
+    if (updated.kmPerLitre !== undefined && updated.kmPerLitre !== kmPerLitre) {
+      setKmPerLitre(updated.kmPerLitre);
+    }
   };
 
   const handlePetrolPriceChange = (val) => {
@@ -100,6 +158,10 @@ export default function Home() {
     setPetrolPrice(DEFAULT_STANDARDS.petrolPricePerLitre);
     setIsPetrolManual(false);
   };
+
+  // Nuværende valgte biler (enten forudindstillet eller egen tilpasset bil)
+  const currentEv = isCustomEv ? customEv : selectedEv;
+  const currentPetrol = isCustomPetrol ? customPetrol : selectedPetrol;
 
   // 4. BEREGNINGER
   const homeElectricityPrice = calculateHomeElectricityPrice(
@@ -119,17 +181,17 @@ export default function Home() {
     annualKm,
     evKmPerKwh: kmPerKwh,
     effectiveElectricityPrice: effectiveKwhPrice,
-    evHalfYearTax: selectedEv.halfYearTax,
-    evAnnualService: selectedEv.annualService,
-    evAnnualInsurance: selectedEv.insuranceYear,
-    evPrice: selectedEv.price,
+    evHalfYearTax: currentEv.halfYearTax,
+    evAnnualService: currentEv.annualService,
+    evAnnualInsurance: currentEv.insuranceYear,
+    evPrice: currentEv.price,
 
     petrolKmPerLitre: kmPerLitre,
     petrolPricePerLitre: petrolPrice,
-    petrolHalfYearTax: selectedPetrol.halfYearTax,
-    petrolAnnualService: selectedPetrol.annualService,
-    petrolAnnualInsurance: selectedPetrol.insuranceYear,
-    petrolPrice: selectedPetrol.price,
+    petrolHalfYearTax: currentPetrol.halfYearTax,
+    petrolAnnualService: currentPetrol.annualService,
+    petrolAnnualInsurance: currentPetrol.insuranceYear,
+    petrolPrice: currentPetrol.price,
 
     ownershipYears: DEFAULT_STANDARDS.ownershipYears
   });
@@ -143,8 +205,8 @@ export default function Home() {
       {/* 2. Hovedresultat / Verdict Hero Card */}
       <VerdictCard 
         calculations={calculations}
-        evName={selectedEv.name}
-        petrolName={selectedPetrol.name}
+        evName={currentEv.name}
+        petrolName={currentPetrol.name}
         onOpenBreakeven={() => setShowBreakevenModal(true)}
       />
 
@@ -160,6 +222,10 @@ export default function Home() {
         onToggleCustomEv={handleToggleCustomEv}
         isCustomPetrol={isCustomPetrol}
         onToggleCustomPetrol={handleToggleCustomPetrol}
+        customEv={customEv}
+        onUpdateCustomEv={handleUpdateCustomEv}
+        customPetrol={customPetrol}
+        onUpdateCustomPetrol={handleUpdateCustomPetrol}
       />
 
       {/* 4. Årlig Kørsel (km) */}
@@ -174,8 +240,8 @@ export default function Home() {
         onChangeKmPerKwh={setKmPerKwh}
         kmPerLitre={kmPerLitre}
         onChangeKmPerLitre={setKmPerLitre}
-        evName={selectedEv.name}
-        petrolName={selectedPetrol.name}
+        evName={currentEv.name}
+        petrolName={currentPetrol.name}
       />
 
       {/* 6. Priser: Benzin & Live DK1 Elpris med refusion */}
@@ -205,8 +271,8 @@ export default function Home() {
       {/* 8. Komplet TCO Breakdown (Samlet oversigt) */}
       <TcoBreakdown
         calculations={calculations}
-        evName={selectedEv.name}
-        petrolName={selectedPetrol.name}
+        evName={currentEv.name}
+        petrolName={currentPetrol.name}
       />
 
       {/* 9. Breakeven Modal */}
@@ -214,8 +280,8 @@ export default function Home() {
         isOpen={showBreakevenModal}
         onClose={() => setShowBreakevenModal(false)}
         calculations={calculations}
-        evName={selectedEv.name}
-        petrolName={selectedPetrol.name}
+        evName={currentEv.name}
+        petrolName={currentPetrol.name}
       />
 
       {/* 10. Sticky Bottom Verdict Bar for hurtig mobil-overblik */}
