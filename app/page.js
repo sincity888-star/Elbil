@@ -15,6 +15,7 @@ import BreakevenModal from '../components/BreakevenModal';
 import TripCostCalculator from '../components/TripCostCalculator';
 import QuickNavPills from '../components/QuickNavPills';
 import SectionHeader from '../components/SectionHeader';
+import PetrolPriceInput from '../components/PetrolPriceInput';
 
 import { PRESET_EV_CARS, PRESET_PETROL_CARS, DEFAULT_STANDARDS } from '../data/cars';
 import {
@@ -314,6 +315,15 @@ export default function Home() {
           petrolName={currentPetrol.name}
         />
 
+        {/* Benzinpris vælger placeret ergonomisk i Trin 2 */}
+        <PetrolPriceInput
+          petrolPrice={petrolPrice}
+          onChangePetrolPrice={handlePetrolPriceChange}
+          defaultPetrolPrice={DEFAULT_STANDARDS.petrolPricePerLitre}
+          isPetrolManual={isPetrolManual}
+          onResetPetrolPrice={handleResetPetrolPrice}
+        />
+
         <TripCostCalculator
           currentEv={currentEv}
           currentPetrol={currentPetrol}
@@ -328,19 +338,14 @@ export default function Home() {
       <section id="section-electricity" className="section-wrapper-amber">
         <SectionHeader
           step="03"
-          badge="Trin 3 · Energi"
+          badge="Trin 3 · Elpris"
           title="Elpriser & Opladning"
-          subtitle="Benzinpris, live DK1 spotpris og smart ladeanbefaling"
+          subtitle="Live DK1 spotpris, forbrugerpris i stikkontakten og smart ladeanbefaling"
           icon={Zap}
           color="#fbbf24"
         />
 
         <PriceInputs
-          petrolPrice={petrolPrice}
-          onChangePetrolPrice={handlePetrolPriceChange}
-          defaultPetrolPrice={DEFAULT_STANDARDS.petrolPricePerLitre}
-          isPetrolManual={isPetrolManual}
-          onResetPetrolPrice={handleResetPetrolPrice}
           spotPriceDk1={spotPriceDk1}
           homePriceKwh={homeElectricityPrice}
           effectiveKwhPrice={effectiveKwhPrice}

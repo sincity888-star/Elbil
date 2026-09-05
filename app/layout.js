@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Elbil vs. Benzinbil | Danmarks Ultimative TCO Beregner',
+  title: 'Elbil vs. Benzinbil | Sincitys Beregner',
   description: 'Beregn din præcise besparelse ved at skifte fra benzin til elbil. Live elpriser for Vestdanmark (DK1), populære bilmodeller og komplet TCO-analyse.',
 };
 

@@ -32,7 +32,7 @@ export default function Header({ dk1Price, isLiveLoading }) {
               <span style={{ color: 'var(--petrol-primary)' }}>Benzin</span>
             </h1>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Danmarks TCO Beregner
+              Sincitys Beregner
             </p>
           </div>
         </div>
