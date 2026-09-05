@@ -46,7 +46,7 @@ export default function Header({ dk1Price, isLiveLoading }) {
         }}>
           <div className="live-pulse" />
           <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#34d399' }}>
-            DK1 Vest
+            DK1 Spot
           </span>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>•</span>
           <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#ffffff' }}>
