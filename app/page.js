@@ -12,6 +12,7 @@ import HourlyPriceChart from '../components/HourlyPriceChart';
 import VerdictCard from '../components/VerdictCard';
 import TcoBreakdown from '../components/TcoBreakdown';
 import BreakevenModal from '../components/BreakevenModal';
+import TripCostCalculator from '../components/TripCostCalculator';
 
 import { PRESET_EV_CARS, PRESET_PETROL_CARS, DEFAULT_STANDARDS } from '../data/cars';
 import {
@@ -314,7 +315,17 @@ export default function Home() {
         <HourlyPriceChart hours={hourlyData} />
       )}
 
-      {/* 8. Komplet TCO Breakdown (Samlet oversigt) */}
+      {/* 10. Rute- & Turberegner (OpenStreetMap & Distance) */}
+      <TripCostCalculator
+        currentEv={currentEv}
+        currentPetrol={currentPetrol}
+        kmPerKwh={kmPerKwh}
+        kmPerLitre={kmPerLitre}
+        petrolPrice={petrolPrice}
+        homeElectricityPrice={homeElectricityPrice}
+      />
+
+      {/* 11. Komplet TCO Breakdown (Samlet oversigt) */}
       <TcoBreakdown
         calculations={calculations}
         evName={currentEv.name}
