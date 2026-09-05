@@ -13,6 +13,8 @@ import VerdictCard from '../components/VerdictCard';
 import TcoBreakdown from '../components/TcoBreakdown';
 import BreakevenModal from '../components/BreakevenModal';
 import TripCostCalculator from '../components/TripCostCalculator';
+import QuickNavPills from '../components/QuickNavPills';
+import SectionHeader from '../components/SectionHeader';
 
 import { PRESET_EV_CARS, PRESET_PETROL_CARS, DEFAULT_STANDARDS } from '../data/cars';
 import {
@@ -21,7 +23,7 @@ import {
   calculateAnnualRunningCosts
 } from '../utils/calculator';
 import { formatCurrency, formatPricePerKm } from '../utils/formatters';
-import { Sparkles, ArrowRight, Zap, Fuel } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Fuel, Car, Navigation, BarChart3, Award } from 'lucide-react';
 
 export default function Home() {
   // 1. Bilvalg
@@ -235,102 +237,146 @@ export default function Home() {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '30px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '30px' }}>
       
       {/* 1. App Header */}
       <Header dk1Price={spotPriceDk1} isLiveLoading={isLiveLoading} />
 
-      {/* 2. Hovedresultat / Verdict Hero Card */}
-      <VerdictCard 
-        calculations={calculations}
-        evName={currentEv.name}
-        petrolName={currentPetrol.name}
-        onOpenBreakeven={() => setShowBreakevenModal(true)}
-      />
+      {/* 2. Hurtig-hop Navigationsbar */}
+      <QuickNavPills />
 
-      {/* 3. Nummerpladeopslag i Motorregistret */}
-      <LicensePlateLookup 
-        onApplyCar={handleApplyCarFromPlate} 
-        activeTab={activeTab} 
-      />
+      {/* OVERBLIK: Hovedresultat / Verdict Hero Card */}
+      <section id="section-verdict" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <VerdictCard 
+          calculations={calculations}
+          evName={currentEv.name}
+          petrolName={currentPetrol.name}
+          onOpenBreakeven={() => setShowBreakevenModal(true)}
+        />
+      </section>
 
-      {/* 4. Bilvælger (Populære modeller + live søgning & dropdown) */}
-      <ModelSelector
-        selectedEv={selectedEv}
-        onSelectEv={handleSelectEv}
-        selectedPetrol={selectedPetrol}
-        onSelectPetrol={handleSelectPetrol}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isCustomEv={isCustomEv}
-        onToggleCustomEv={handleToggleCustomEv}
-        isCustomPetrol={isCustomPetrol}
-        onToggleCustomPetrol={handleToggleCustomPetrol}
-        customEv={customEv}
-        onUpdateCustomEv={handleUpdateCustomEv}
-        customPetrol={customPetrol}
-        onUpdateCustomPetrol={handleUpdateCustomPetrol}
-      />
+      {/* TRIN 1: Biler & Nummerpladeopslag (Kongeblå / Indigo) */}
+      <section id="section-cars" className="section-wrapper-indigo">
+        <SectionHeader
+          step="01"
+          badge="Trin 1 · Biler"
+          title="Biler & Nummerplade"
+          subtitle="Vælg dine biler eller søg automatisk via nummerplade i Motorregistret"
+          icon={Car}
+          color="#818cf8"
+        />
 
-      {/* 5. Årlig Kørsel (km) */}
-      <DrivingInputs 
-        annualKm={annualKm} 
-        onChangeKm={setAnnualKm} 
-      />
+        <LicensePlateLookup 
+          onApplyCar={handleApplyCarFromPlate} 
+          activeTab={activeTab} 
+        />
 
-      {/* 6. Forbrug: km/kWh og km/l */}
-      <EnergyInputs
-        kmPerKwh={kmPerKwh}
-        onChangeKmPerKwh={setKmPerKwh}
-        kmPerLitre={kmPerLitre}
-        onChangeKmPerLitre={setKmPerLitre}
-        evName={currentEv.name}
-        petrolName={currentPetrol.name}
-      />
+        <ModelSelector
+          selectedEv={selectedEv}
+          onSelectEv={handleSelectEv}
+          selectedPetrol={selectedPetrol}
+          onSelectPetrol={handleSelectPetrol}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isCustomEv={isCustomEv}
+          onToggleCustomEv={handleToggleCustomEv}
+          isCustomPetrol={isCustomPetrol}
+          onToggleCustomPetrol={handleToggleCustomPetrol}
+          customEv={customEv}
+          onUpdateCustomEv={handleUpdateCustomEv}
+          customPetrol={customPetrol}
+          onUpdateCustomPetrol={handleUpdateCustomPetrol}
+        />
+      </section>
 
-      {/* 7. Priser: Benzin & Live DK1 Elpris */}
-      <PriceInputs
-        petrolPrice={petrolPrice}
-        onChangePetrolPrice={handlePetrolPriceChange}
-        defaultPetrolPrice={DEFAULT_STANDARDS.petrolPricePerLitre}
-        isPetrolManual={isPetrolManual}
-        onResetPetrolPrice={handleResetPetrolPrice}
-        spotPriceDk1={spotPriceDk1}
-        homePriceKwh={homeElectricityPrice}
-        effectiveKwhPrice={effectiveKwhPrice}
-        homeSharePercent={homeSharePercent}
-        onChangeHomeSharePercent={setHomeSharePercent}
-        isLiveLoading={isLiveLoading}
-      />
+      {/* TRIN 2: Kørsel, Rute & Forbrug (Havblå / Cyan) */}
+      <section id="section-driving" className="section-wrapper-cyan">
+        <SectionHeader
+          step="02"
+          badge="Trin 2 · Kørsel"
+          title="Kørsel & Ruteberegner"
+          subtitle="Årlig distance, forbrug og specifik kørsel fra A til B via OpenStreetMap"
+          icon={Navigation}
+          color="#22d3ee"
+        />
 
-      {/* 8. Smart Ladeanbefaling: Hvornår er det billigst at lade */}
-      <SmartChargingAdvisor
-        hours={hourlyData}
-        onToggleChart={() => setShowHourlyChart(prev => !prev)}
-        isChartOpen={showHourlyChart}
-      />
+        <DrivingInputs 
+          annualKm={annualKm} 
+          onChangeKm={setAnnualKm} 
+        />
 
-      {/* 9. 24-timers elpris graf (fold-ud) */}
-      {showHourlyChart && (
-        <HourlyPriceChart hours={hourlyData} />
-      )}
+        <EnergyInputs
+          kmPerKwh={kmPerKwh}
+          onChangeKmPerKwh={setKmPerKwh}
+          kmPerLitre={kmPerLitre}
+          onChangeKmPerLitre={setKmPerLitre}
+          evName={currentEv.name}
+          petrolName={currentPetrol.name}
+        />
 
-      {/* 10. Rute- & Turberegner (OpenStreetMap & Distance) */}
-      <TripCostCalculator
-        currentEv={currentEv}
-        currentPetrol={currentPetrol}
-        kmPerKwh={kmPerKwh}
-        kmPerLitre={kmPerLitre}
-        petrolPrice={petrolPrice}
-        homeElectricityPrice={homeElectricityPrice}
-      />
+        <TripCostCalculator
+          currentEv={currentEv}
+          currentPetrol={currentPetrol}
+          kmPerKwh={kmPerKwh}
+          kmPerLitre={kmPerLitre}
+          petrolPrice={petrolPrice}
+          homeElectricityPrice={homeElectricityPrice}
+        />
+      </section>
 
-      {/* 11. Komplet TCO Breakdown (Samlet oversigt) */}
-      <TcoBreakdown
-        calculations={calculations}
-        evName={currentEv.name}
-        petrolName={currentPetrol.name}
-      />
+      {/* TRIN 3: Elpriser & Smart Opladning (Gylden Amber / Varm Solgul) */}
+      <section id="section-electricity" className="section-wrapper-amber">
+        <SectionHeader
+          step="03"
+          badge="Trin 3 · Energi"
+          title="Elpriser & Opladning"
+          subtitle="Benzinpris, live DK1 spotpris og smart ladeanbefaling"
+          icon={Zap}
+          color="#fbbf24"
+        />
+
+        <PriceInputs
+          petrolPrice={petrolPrice}
+          onChangePetrolPrice={handlePetrolPriceChange}
+          defaultPetrolPrice={DEFAULT_STANDARDS.petrolPricePerLitre}
+          isPetrolManual={isPetrolManual}
+          onResetPetrolPrice={handleResetPetrolPrice}
+          spotPriceDk1={spotPriceDk1}
+          homePriceKwh={homeElectricityPrice}
+          effectiveKwhPrice={effectiveKwhPrice}
+          homeSharePercent={homeSharePercent}
+          onChangeHomeSharePercent={setHomeSharePercent}
+          isLiveLoading={isLiveLoading}
+        />
+
+        <SmartChargingAdvisor
+          hours={hourlyData}
+          onToggleChart={() => setShowHourlyChart(prev => !prev)}
+          isChartOpen={showHourlyChart}
+        />
+
+        {showHourlyChart && (
+          <HourlyPriceChart hours={hourlyData} />
+        )}
+      </section>
+
+      {/* TRIN 4: Samlet TCO Regnskab (Dyb Lilla / Violet) */}
+      <section id="section-tco" className="section-wrapper-purple">
+        <SectionHeader
+          step="04"
+          badge="Trin 4 · Økonomi"
+          title="Samlet TCO Regnskab"
+          subtitle="Total Cost of Ownership over 5 år inkl. værditab, service og faste udgifter"
+          icon={BarChart3}
+          color="#c084fc"
+        />
+
+        <TcoBreakdown
+          calculations={calculations}
+          evName={currentEv.name}
+          petrolName={currentPetrol.name}
+        />
+      </section>
 
       {/* 9. Breakeven Modal */}
       <BreakevenModal
