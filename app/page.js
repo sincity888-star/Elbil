@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ModelSelector from '../components/ModelSelector';
-import LicensePlateLookup from '../components/LicensePlateLookup';
 import DrivingInputs from '../components/DrivingInputs';
 import EnergyInputs from '../components/EnergyInputs';
 import PriceInputs from '../components/PriceInputs';
@@ -320,11 +319,6 @@ export default function Home() {
           color="#818cf8"
         />
 
-        <LicensePlateLookup 
-          onApplyCar={handleApplyCarFromPlate} 
-          activeTab={activeTab} 
-        />
-
         <ModelSelector
           selectedEv={selectedEv}
           onSelectEv={handleSelectEv}
@@ -340,6 +334,7 @@ export default function Home() {
           onUpdateCustomEv={handleUpdateCustomEv}
           customPetrol={customPetrol}
           onUpdateCustomPetrol={handleUpdateCustomPetrol}
+          onApplyCarFromPlate={handleApplyCarFromPlate}
         />
       </section>
 

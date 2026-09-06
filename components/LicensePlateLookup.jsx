@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { Search, Loader2, CheckCircle2, AlertCircle, Car, Sparkles, KeyRound } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
-export default function LicensePlateLookup({ onApplyCar, activeTab }) {
+export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen = false }) {
   const [plateInput, setPlateInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initialOpen);
 
   const samplePlates = [
     { label: 'Elbil (Tesla Y)', code: 'EK99123' },
