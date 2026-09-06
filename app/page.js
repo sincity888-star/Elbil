@@ -81,6 +81,26 @@ export default function Home() {
   const [showHourlyChart, setShowHourlyChart] = useState(false);
   const [showBreakevenModal, setShowBreakevenModal] = useState(false);
 
+  // 4. Tema (Mørkt vs. Lyst tema med automatisk huske-funktion)
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sincity_theme') || 'dark';
+      setTheme(saved);
+      document.documentElement.setAttribute('data-theme', saved);
+    } catch (e) {}
+  }, []);
+
+  const handleToggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    try {
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      localStorage.setItem('sincity_theme', nextTheme);
+    } catch (e) {}
+  };
+
   // Hent live elpris (DK1 el. DK2) automatisk ved indlæsning og område-skift
   useEffect(() => {
     async function fetchLiveElpris() {
@@ -267,8 +287,14 @@ export default function Home() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '30px' }}>
       
-      {/* 1. App Header */}
-      <Header dk1Price={spotPriceDk1} isLiveLoading={isLiveLoading} priceArea={priceArea} />
+      {/* 1. App Header med Tema Switcher */}
+      <Header 
+        dk1Price={spotPriceDk1} 
+        isLiveLoading={isLiveLoading} 
+        priceArea={priceArea} 
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+      />
 
       {/* 2. Hurtig-hop Navigationsbar */}
       <QuickNavPills />

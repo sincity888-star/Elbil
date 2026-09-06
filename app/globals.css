@@ -1,13 +1,15 @@
 /* =========================================================
-   ELBIL VS. BENZINBIL — ELEGANTE MØRKT MOBIL TEMA
+   ELBIL VS. BENZINBIL — DESIGN SYSTEM & TEMAER (MØRK & LYS)
    ========================================================= */
 
 :root {
+  /* Standard: Mørkt tema */
   --bg-main: #0a0e17;
   --bg-surface: #111827;
   --bg-card: #162032;
   --bg-card-hover: #1e2b42;
   --bg-card-subtle: rgba(255, 255, 255, 0.03);
+  --box-inset-bg: rgba(0, 0, 0, 0.35);
   
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-focus: rgba(255, 255, 255, 0.2);
@@ -31,11 +33,54 @@
   --text-muted: #9ca3af;
   --text-dim: #6b7280;
   
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --modal-bg: #131b28;
+  --quicknav-bg: rgba(10, 14, 23, 0.85);
+
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
+}
+
+/* =========================================================
+   LYST TEMA (FRISK, MODERNE SKANDINAVISK LOOK)
+   ========================================================= */
+
+[data-theme="light"] {
+  --bg-main: #f8fafc;              /* Slate 50 */
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-card-subtle: #f8fafc;
+  --box-inset-bg: #f1f5f9;
+  
+  --border-subtle: #e2e8f0;        /* Slate 200 */
+  --border-focus: #94a3b8;         /* Slate 400 */
+  
+  /* Elbil (Dyb Emerald til hvid baggrund) */
+  --ev-primary: #059669;
+  --ev-secondary: #047857;
+  --ev-glow: rgba(5, 150, 105, 0.15);
+  --ev-border: rgba(5, 150, 105, 0.25);
+  --ev-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  
+  /* Benzinbil (Dyb Rose / Crimson til hvid baggrund) */
+  --petrol-primary: #e11d48;
+  --petrol-secondary: #be123c;
+  --petrol-glow: rgba(225, 29, 72, 0.15);
+  --petrol-border: rgba(225, 29, 72, 0.25);
+  --petrol-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  
+  /* Tekst & Accents (Mørk Slate for maksimal læsbarhed) */
+  --text-main: #0f172a;            /* Slate 900 */
+  --text-muted: #475569;           /* Slate 600 */
+  --text-dim: #64748b;             /* Slate 500 */
+  
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --modal-bg: #ffffff;
+  --quicknav-bg: rgba(255, 255, 255, 0.9);
 }
 
 * {
@@ -52,6 +97,7 @@ html, body {
   min-height: 100%;
   overscroll-behavior-y: none;
   touch-action: manipulation;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
@@ -59,10 +105,10 @@ body {
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  padding-bottom: 90px; /* Plads til sticky verdict bar på mobil */
+  padding-bottom: 90px;
 }
 
-/* Mobil Wrapper (Centreret app-frame på desktop, 100% på mobil) */
+/* Mobil Wrapper */
 .mobile-app-container {
   width: 100%;
   max-width: 540px;
@@ -72,9 +118,14 @@ body {
   position: relative;
   background: var(--bg-main);
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.7);
+  transition: background-color 0.25s ease;
 }
 
-/* Glassmorphism Card */
+[data-theme="light"] .mobile-app-container {
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.08);
+}
+
+/* Glassmorphism / Premium Card */
 .premium-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -82,8 +133,8 @@ body {
   padding: 18px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
 }
 
 .premium-card:active {
@@ -98,6 +149,12 @@ body {
   padding: 4px;
   border: 1px solid var(--border-subtle);
   gap: 4px;
+  transition: background-color 0.25s ease;
+}
+
+[data-theme="light"] .segmented-control {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
 }
 
 .segmented-btn {
@@ -143,6 +200,10 @@ input[type="range"] {
   margin: 12px 0;
 }
 
+[data-theme="light"] input[type="range"] {
+  background: #e2e8f0;
+}
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -150,9 +211,13 @@ input[type="range"]::-webkit-slider-thumb {
   height: 26px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   cursor: grab;
   transition: transform 0.1s ease;
+}
+
+[data-theme="light"] input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 input[type="range"]::-webkit-slider-thumb:active {
@@ -160,19 +225,17 @@ input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
 }
 
-/* Elbil variant thumb */
 input[type="range"].slider-ev::-webkit-slider-thumb {
   border: 3px solid var(--ev-primary);
 }
 
-/* Benzin variant thumb */
 input[type="range"].slider-petrol::-webkit-slider-thumb {
   border: 3px solid var(--petrol-primary);
 }
 
 /* Tal-input med fin haptisk boks */
 .input-number-box {
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--box-inset-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 8px 12px;
@@ -182,12 +245,29 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   text-align: right;
   width: 110px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+}
+
+[data-theme="light"] .input-number-box {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
 .input-number-box:focus {
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .input-number-box:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Quick Nav Bar */
+.quick-nav-bar {
+  background: var(--quicknav-bg);
+  transition: background-color 0.25s ease;
 }
 
 /* Sticky Bottom Verdict Bar */
@@ -208,6 +288,13 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   align-items: center;
   z-index: 100;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.25s ease;
+}
+
+[data-theme="light"] .sticky-verdict-bar {
+  background: rgba(255, 255, 255, 0.94);
+  border-top-color: #e2e8f0;
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.08);
 }
 
 /* Pulserende live-prik */
@@ -251,6 +338,12 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   box-shadow: 0 8px 30px rgba(99, 102, 241, 0.04);
 }
 
+[data-theme="light"] .section-wrapper-indigo {
+  background: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.05);
+}
+
 /* 2. Kørsel & Rute (Cyan / Turkis) */
 .section-wrapper-cyan {
   background: linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, rgba(8, 47, 73, 0.08) 100%);
@@ -261,6 +354,12 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   flex-direction: column;
   gap: 14px;
   box-shadow: 0 8px 30px rgba(6, 182, 212, 0.04);
+}
+
+[data-theme="light"] .section-wrapper-cyan {
+  background: linear-gradient(180deg, #f0fdfa 0%, #ecfeff 100%);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.05);
 }
 
 /* 3. Elpriser & Opladning (Gylden Amber / Varm Solgul) */
@@ -275,6 +374,12 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   box-shadow: 0 8px 30px rgba(245, 158, 11, 0.04);
 }
 
+[data-theme="light"] .section-wrapper-amber {
+  background: linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.05);
+}
+
 /* 4. TCO Samlet Regnskab (Dyb Lilla / Violet) */
 .section-wrapper-purple {
   background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, rgba(59, 7, 100, 0.08) 100%);
@@ -285,4 +390,67 @@ input[type="range"].slider-petrol::-webkit-slider-thumb {
   flex-direction: column;
   gap: 14px;
   box-shadow: 0 8px 30px rgba(168, 85, 247, 0.04);
+}
+
+[data-theme="light"] .section-wrapper-purple {
+  background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.05);
+}
+
+/* =========================================================
+   LIGHT THEME ELEMENT & TEXT OVERRIDES
+   ========================================================= */
+
+[data-theme="light"] header {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+}
+
+[data-theme="light"] .premium-card {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5 {
+  color: #0f172a !important;
+}
+
+/* Specifikke mørke overlays omformes til lyse i Light Mode */
+[data-theme="light"] div[style*="background: rgba(0, 0, 0,"],
+[data-theme="light"] div[style*="background: 'rgba(0, 0, 0,"],
+[data-theme="light"] div[style*="background:rgba(0,0,0,"] {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] div[style*="background: 'linear-gradient(145deg, #111e2e"],
+[data-theme="light"] div[style*="background: linear-gradient(145deg, #111e2e"] {
+  background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.1) !important;
+}
+
+[data-theme="light"] div[style*="background: '#131b28'"],
+[data-theme="light"] div[style*="background: #131b28"] {
+  background: #ffffff !important;
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] div[style*="background: '#0e1522'"],
+[data-theme="light"] div[style*="background: #0e1522"] {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Bevar hvid tekst på farvede knapper & gradient badges */
+[data-theme="light"] button[style*="linear-gradient"] *,
+[data-theme="light"] button[style*="linear-gradient"],
+[data-theme="light"] .segmented-btn.active-ev,
+[data-theme="light"] .segmented-btn.active-petrol,
+[data-theme="light"] .segmented-btn.active-ev *,
+[data-theme="light"] .segmented-btn.active-petrol * {
+  color: #ffffff !important;
 }

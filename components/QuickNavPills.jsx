@@ -52,10 +52,9 @@ export default function QuickNavPills() {
         position: 'sticky',
         top: 0,
         zIndex: 90,
-        background: 'rgba(10, 14, 23, 0.85)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        borderBottom: '1px solid var(--border-subtle)',
         padding: '8px 12px',
         margin: '0 -4px 10px -4px',
         display: 'flex',
@@ -65,7 +64,7 @@ export default function QuickNavPills() {
         scrollbarWidth: 'none',
         msOverflowStyle: 'none'
       }}
-      className="no-scrollbar"
+      className="quick-nav-bar no-scrollbar"
     >
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
