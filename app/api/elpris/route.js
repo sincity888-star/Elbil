@@ -1,34 +1,48 @@
 import { NextResponse } from 'next/server';
 
-export const revalidate = 600; // Cache i 10 minutter på serveren for altid friske priser
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-// Realistisk backup døgnkurve for DK1 (Vestdanmark) med aktuel markedspris (~0,30-0,60 kr. spot)
-const FALLBACK_DK1_HOURS = [
+// Realistisk backup døgnkurve for DK1/DK2 hvis Energi Data Service midlertidigt er nede
+const FALLBACK_HOURS = [
   { hour: '00:00', spot: 0.38 }, { hour: '01:00', spot: 0.36 },
   { hour: '02:00', spot: 0.39 }, { hour: '03:00', spot: 0.40 },
   { hour: '04:00', spot: 0.36 }, { hour: '05:00', spot: 0.34 },
   { hour: '06:00', spot: 0.42 }, { hour: '07:00', spot: 0.45 },
   { hour: '08:00', spot: 0.23 }, { hour: '09:00', spot: 0.15 },
-  { hour: '10:00', spot: 0.10 }, { hour: '11:00', spot: 0.08 },
-  { hour: '12:00', spot: 0.05 }, { hour: '13:00', spot: 0.08 },
-  { hour: '14:00', spot: 0.12 }, { hour: '15:00', spot: 0.22 },
-  { hour: '16:00', spot: 0.35 }, { hour: '17:00', spot: 0.52 },
+  { hour: '10:00', spot: 0.05 }, { hour: '11:00', spot: 0.00 },
+  { hour: '12:00', spot: 0.00 }, { hour: '13:00', spot: 0.01 },
+  { hour: '14:00', spot: 0.01 }, { hour: '15:00', spot: 0.01 },
+  { hour: '16:00', spot: 0.15 }, { hour: '17:00', spot: 0.52 },
   { hour: '18:00', spot: 0.65 }, { hour: '19:00', spot: 0.58 },
   { hour: '20:00', spot: 0.58 }, { hour: '21:00', spot: 0.56 },
   { hour: '22:00', spot: 0.48 }, { hour: '23:00', spot: 0.42 }
 ];
 
-export async function GET() {
-  const currentHourNum = new Date().getHours();
-  
+export async function GET(request) {
+  // Prisområde: DK1 (Vestdanmark/Jylland+Fyn) eller DK2 (Østdanmark/Sjælland+Kbh)
+  let area = 'DK1';
+  try {
+    const { searchParams } = new URL(request.url);
+    if ((searchParams.get('area') || '').toUpperCase() === 'DK2') {
+      area = 'DK2';
+    }
+  } catch (e) {}
+
+  // Præcis dansk tid i Europe/Copenhagen uanset serverens hostingtidszone (f.eks. UTC på Vercel)
+  const now = new Date();
+  const danishDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(now); // 'YYYY-MM-DD'
+  const danishHourStr = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hour12: false }).format(now); // 'HH'
+  const danishHourNum = parseInt(danishHourStr, 10);
+  const currentKey = `${danishDateStr}T${danishHourStr}`;
+
   try {
     // Energi Data Service: DayAheadPrices (det aktive officielle datasæt i Danmark efter lukning af Elspotprices)
-    // Sorteret faldende på TimeDK for at få de nyeste dags- og timedata for DK1 (Vestdanmark)
-    const url = 'https://api.energidataservice.dk/dataset/DayAheadPrices?filter=%7B%22PriceArea%22%3A%22DK1%22%7D&sort=TimeDK%20desc&limit=140';
+    const url = `https://api.energidataservice.dk/dataset/DayAheadPrices?filter=%7B%22PriceArea%22%3A%22${area}%22%7D&sort=TimeDK%20desc&limit=140`;
     
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' },
-      next: { revalidate: 600 }
+      cache: 'no-store'
     });
 
     if (response.ok) {
@@ -36,18 +50,18 @@ export async function GET() {
       const records = json.records || [];
 
       if (records.length > 0) {
-        // Gruppér de 15-minutters intervaller til hele timer (f.eks. '2026-09-05T08')
+        // Gruppér de 15-minutters intervaller til hele timer (f.eks. '2026-09-06T11')
         const hourMap = new Map();
         for (const r of records) {
           const key = r.TimeDK.slice(0, 13);
-          const d = new Date(r.TimeDK);
+          const hourNum = parseInt(r.TimeDK.slice(11, 13), 10);
           const spotKwh = Number(r.DayAheadPriceDKK) / 1000;
 
           if (!hourMap.has(key)) {
             hourMap.set(key, {
               dateKey: key,
-              hourNumber: d.getHours(),
-              hourLabel: `${String(d.getHours()).padStart(2, '0')}:00`,
+              hourNumber: hourNum,
+              hourLabel: `${String(hourNum).padStart(2, '0')}:00`,
               spotSum: 0,
               count: 0
             });
@@ -62,7 +76,7 @@ export async function GET() {
           .map(h => {
             const avgSpot = Number((h.spotSum / h.count).toFixed(3));
             // Forbrugerpris: Rå spotpris + 0.50 kr. nettarif + 0.01 kr. elafgift (1 øre EU-minimum) + 25% moms
-            const consumerPriceHome = Number(((avgSpot + 0.50 + 0.01) * 1.25).toFixed(2));
+            const consumerPriceHome = Number(((Math.max(0, avgSpot) + 0.50 + 0.01) * 1.25).toFixed(2));
             return {
               dateKey: h.dateKey,
               hour: h.hourLabel,
@@ -80,18 +94,22 @@ export async function GET() {
 
           const hours = sortedHours.map(h => ({
             ...h,
-            isCurrent: h.hourNumber === currentHourNum,
+            isCurrent: h.dateKey === currentKey || (h.dateKey.startsWith(danishDateStr) && h.hourNumber === danishHourNum),
             isLowest: h.consumerPriceHome <= minPrice + 0.08
           }));
 
-          const currentRecord = hours.find(h => h.isCurrent) || hours[hours.length - 1];
+          const currentRecord = hours.find(h => h.isCurrent) 
+            || hours.find(h => h.hourNumber === danishHourNum) 
+            || hours[hours.length - 1];
           const avgSpot = Number((hours.reduce((acc, h) => acc + h.spotPriceKwh, 0) / hours.length).toFixed(3));
           const avgConsumerHome = Number((hours.reduce((acc, h) => acc + h.consumerPriceHome, 0) / hours.length).toFixed(2));
 
           return NextResponse.json({
             success: true,
-            priceArea: 'DK1 (Vestdanmark)',
+            priceArea: area === 'DK2' ? 'DK2 (Østdanmark / Sjælland)' : 'DK1 (Vestdanmark / Jylland & Fyn)',
+            areaCode: area,
             source: 'Energi Data Service (DayAheadPrices Live)',
+            danishTime: `${currentKey}:00`,
             updatedAt: new Date().toISOString(),
             currentPrice: {
               spotKwh: currentRecord.spotPriceKwh,
@@ -103,6 +121,10 @@ export async function GET() {
               avgConsumerHomeKwh: avgConsumerHome
             },
             hours
+          }, {
+            headers: {
+              'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
+            }
           });
         }
       }
@@ -111,29 +133,32 @@ export async function GET() {
     console.warn('Elpris API DayAheadPrices fetch failed, using calibrated fallback:', error.message);
   }
 
-  // Fallback data
-  const hours = FALLBACK_DK1_HOURS.map(h => {
+  // Fallback data hvis netværk fejler
+  const hours = FALLBACK_HOURS.map(h => {
     const spotKwh = h.spot;
-    const consumerPriceHome = Number(((spotKwh + 0.50 + 0.01) * 1.25).toFixed(2));
+    const consumerPriceHome = Number(((Math.max(0, spotKwh) + 0.50 + 0.01) * 1.25).toFixed(2));
     const hourNum = parseInt(h.hour.split(':')[0], 10);
     return {
+      dateKey: `${danishDateStr}T${String(hourNum).padStart(2, '0')}`,
       hour: h.hour,
       hourNumber: hourNum,
       spotPriceKwh: spotKwh,
       consumerPriceHome,
-      isCurrent: hourNum === currentHourNum,
-      isLowest: spotKwh <= 0.15
+      isCurrent: hourNum === danishHourNum,
+      isLowest: spotKwh <= 0.05
     };
   });
 
-  const currentRecord = hours.find(h => h.isCurrent) || hours[currentHourNum] || hours[0];
-  const avgSpot = 0.32;
-  const avgConsumerHome = 1.03;
+  const currentRecord = hours.find(h => h.isCurrent) || hours[danishHourNum] || hours[0];
+  const avgSpot = 0.28;
+  const avgConsumerHome = 0.98;
 
   return NextResponse.json({
     success: true,
-    priceArea: 'DK1 (Vestdanmark)',
+    priceArea: area === 'DK2' ? 'DK2 (Østdanmark / Sjælland)' : 'DK1 (Vestdanmark / Jylland & Fyn)',
+    areaCode: area,
     source: 'Energi Data Service (Estimeret backup)',
+    danishTime: `${currentKey}:00`,
     updatedAt: new Date().toISOString(),
     currentPrice: {
       spotKwh: currentRecord.spotPriceKwh,
@@ -145,5 +170,9 @@ export async function GET() {
       avgConsumerHomeKwh: avgConsumerHome
     },
     hours
+  }, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
+    }
   });
 }

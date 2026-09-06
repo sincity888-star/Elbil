@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Zap, Fuel, Activity, Sparkles } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
-export default function Header({ dk1Price, isLiveLoading }) {
+export default function Header({ dk1Price, isLiveLoading, priceArea = 'DK1' }) {
+  const displayPrice = (dk1Price !== undefined && dk1Price !== null) ? Number(dk1Price).toFixed(2) : '0,20';
+
   return (
     <header style={{
       padding: '20px 20px 14px 20px',
@@ -37,7 +39,7 @@ export default function Header({ dk1Price, isLiveLoading }) {
           </div>
         </div>
 
-        {/* Live DK1 Badge */}
+        {/* Live Spot Badge */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: '6px',
           background: 'rgba(16, 185, 129, 0.1)',
@@ -46,11 +48,11 @@ export default function Header({ dk1Price, isLiveLoading }) {
         }}>
           <div className="live-pulse" />
           <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#34d399' }}>
-            DK1 Spot
+            {priceArea} Spot
           </span>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>•</span>
           <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#ffffff' }}>
-            {isLiveLoading ? 'Henter...' : `${dk1Price?.toFixed(2) || '0,75'} kr.`}
+            {isLiveLoading ? 'Henter...' : `${displayPrice} kr.`}
           </span>
         </div>
       </div>

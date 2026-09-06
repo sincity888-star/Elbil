@@ -67,27 +67,34 @@ export default function Home() {
   const [kmPerKwh, setKmPerKwh] = useState(PRESET_EV_CARS[0].kmPerKwh);
   const [kmPerLitre, setKmPerLitre] = useState(PRESET_PETROL_CARS[0].kmPerLitre);
 
-  // 3. Priser & Elpris Vest (DK1)
+  // 3. Priser & Elpris (DK1 / DK2)
   const [petrolPrice, setPetrolPrice] = useState(DEFAULT_STANDARDS.petrolPricePerLitre);
   const [isPetrolManual, setIsPetrolManual] = useState(false);
 
-  const [spotPriceDk1, setSpotPriceDk1] = useState(DEFAULT_STANDARDS.defaultSpotPriceDk1Kwh);
+  const [priceArea, setPriceArea] = useState('DK1');
+  const [spotPriceDk1, setSpotPriceDk1] = useState(0.00);
+  const [liveSpotPrice, setLiveSpotPrice] = useState(0.00);
+  const [isSpotManual, setIsSpotManual] = useState(false);
   const [hourlyData, setHourlyData] = useState([]);
   const [isLiveLoading, setIsLiveLoading] = useState(true);
   const [homeSharePercent, setHomeSharePercent] = useState(DEFAULT_STANDARDS.homeChargingPercent);
   const [showHourlyChart, setShowHourlyChart] = useState(false);
   const [showBreakevenModal, setShowBreakevenModal] = useState(false);
 
-  // Hent live DK1 elpris automatisk ved indlæsning
+  // Hent live elpris (DK1 el. DK2) automatisk ved indlæsning og område-skift
   useEffect(() => {
     async function fetchLiveElpris() {
       try {
         setIsLiveLoading(true);
-        const res = await fetch('/api/elpris');
+        const res = await fetch(`/api/elpris?area=${priceArea}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (data.currentPrice?.spotKwh !== undefined) {
-            setSpotPriceDk1(data.currentPrice.spotKwh);
+            const liveKwh = Number(data.currentPrice.spotKwh);
+            setLiveSpotPrice(liveKwh);
+            if (!isSpotManual) {
+              setSpotPriceDk1(liveKwh);
+            }
           }
           if (data.hours) {
             setHourlyData(data.hours);
@@ -100,7 +107,7 @@ export default function Home() {
       }
     }
     fetchLiveElpris();
-  }, []);
+  }, [priceArea]);
 
   // Når der vælges en ny forudindstillet elbil
   const handleSelectEv = (car) => {
@@ -162,6 +169,26 @@ export default function Home() {
   const handleResetPetrolPrice = () => {
     setPetrolPrice(DEFAULT_STANDARDS.petrolPricePerLitre);
     setIsPetrolManual(false);
+  };
+
+  const handleSpotPriceChange = (val) => {
+    setSpotPriceDk1(Number(val));
+    setIsSpotManual(true);
+  };
+
+  const handleResetSpotPrice = () => {
+    setSpotPriceDk1(liveSpotPrice);
+    setIsSpotManual(false);
+  };
+
+  const handlePriceAreaChange = (newArea) => {
+    setPriceArea(newArea);
+    setIsSpotManual(false);
+  };
+
+  const handleSelectHourPrice = (selectedSpot) => {
+    setSpotPriceDk1(Number(selectedSpot));
+    setIsSpotManual(true);
   };
 
   // Når brugeren slår en bil op via nummerplade
@@ -241,7 +268,7 @@ export default function Home() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '30px' }}>
       
       {/* 1. App Header */}
-      <Header dk1Price={spotPriceDk1} isLiveLoading={isLiveLoading} />
+      <Header dk1Price={spotPriceDk1} isLiveLoading={isLiveLoading} priceArea={priceArea} />
 
       {/* 2. Hurtig-hop Navigationsbar */}
       <QuickNavPills />
@@ -352,6 +379,12 @@ export default function Home() {
           homeSharePercent={homeSharePercent}
           onChangeHomeSharePercent={setHomeSharePercent}
           isLiveLoading={isLiveLoading}
+          priceArea={priceArea}
+          onChangePriceArea={handlePriceAreaChange}
+          onSpotPriceChange={handleSpotPriceChange}
+          isSpotManual={isSpotManual}
+          onResetSpotPrice={handleResetSpotPrice}
+          liveSpotPrice={liveSpotPrice}
         />
 
         <SmartChargingAdvisor
@@ -361,7 +394,11 @@ export default function Home() {
         />
 
         {showHourlyChart && (
-          <HourlyPriceChart hours={hourlyData} />
+          <HourlyPriceChart 
+            hours={hourlyData} 
+            onSelectHourPrice={handleSelectHourPrice}
+            priceArea={priceArea}
+          />
         )}
       </section>
 
