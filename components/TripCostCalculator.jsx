@@ -65,6 +65,7 @@ export default function TripCostCalculator({
   // Rutedata
   const [distanceKm, setDistanceKm] = useState(303.6);
   const [durationText, setDurationText] = useState('3 t 26 min');
+  const [durationMinutes, setDurationMinutes] = useState(206);
   const [coordinates, setCoordinates] = useState([]);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [routeError, setRouteError] = useState(null);
@@ -108,6 +109,7 @@ export default function TripCostCalculator({
       if (data.success) {
         setDistanceKm(data.distanceKm);
         setDurationText(data.formattedDuration);
+        setDurationMinutes(data.durationMinutes);
         setCoordinates(data.coordinates || []);
         setManualKm(data.distanceKm);
         setIsManualKm(false);
@@ -865,7 +867,9 @@ export default function TripCostCalculator({
             coordinates={coordinates}
             fromLabel={fromInput}
             toLabel={toInput}
-            height="320px"
+            distanceKm={distanceKm}
+            durationMinutes={durationMinutes}
+            height="360px"
           />
         </div>
       )}
