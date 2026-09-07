@@ -313,8 +313,8 @@ export default function Home() {
         <SectionHeader
           step="01"
           badge="Trin 1 · Biler"
-          title="Biler & Nummerplade"
-          subtitle="Vælg dine biler eller søg automatisk via nummerplade i Motorregistret"
+          title="Nummerplade & Bilkonfiguration"
+          subtitle="Slå dine biler op via dansk nummerplade eller konfigurer specifikationerne manuelt"
           icon={Car}
           color="#818cf8"
         />

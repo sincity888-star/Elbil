@@ -4,17 +4,19 @@ import React, { useState } from 'react';
 import { Search, Loader2, CheckCircle2, AlertCircle, Car, Sparkles, KeyRound } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
 
-export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen = false }) {
+export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen = false, alwaysOpen = false, onSwitchToCustom }) {
   const [plateInput, setPlateInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [isOpen, setIsOpen] = useState(initialOpen);
+  const [isOpen, setIsOpen] = useState(alwaysOpen || initialOpen);
+  const [appliedMessage, setAppliedMessage] = useState('');
 
   const samplePlates = [
     { label: 'Elbil (Tesla Y)', code: 'EK99123' },
     { label: 'Benzin (Golf TSI)', code: 'AB12345' },
-    { label: 'Hybrid (Yaris)', code: 'DG77123' }
+    { label: 'Elbil (ID.4)', code: 'EV44123' },
+    { label: 'Benzin (Peugeot 208)', code: 'PZ88123' }
   ];
 
   const handleLookup = async (plateToSearch) => {
@@ -27,6 +29,7 @@ export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen 
     setLoading(true);
     setError('');
     setResult(null);
+    setAppliedMessage('');
 
     try {
       const res = await fetch(`/api/nummerplade?plate=${encodeURIComponent(query)}`);
@@ -47,64 +50,71 @@ export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen 
   const handleSelectFoundCar = () => {
     if (result && result.car) {
       onApplyCar(result.car);
-      setIsOpen(false);
+      setAppliedMessage(`✓ ${result.car.name} (${result.car.plate}) er nu valgt som aktiv ${result.car.type === 'ev' ? 'elbil' : 'benzinbil'}!`);
+      if (!alwaysOpen) {
+        setIsOpen(false);
+      }
     }
   };
 
-  return (
-    <div style={{ padding: '0 16px' }}>
-      
-      {/* Åbn / Luk knap for Nummerpladeopslag */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%)',
-        border: '1px solid rgba(234, 179, 8, 0.3)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '14px 16px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '10px',
-              background: 'rgba(234, 179, 8, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              <Car size={20} color="#fbbf24" />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#ffffff' }}>
-                  Slå din bil op på nummerplade
-                </h3>
-                <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(234, 179, 8, 0.25)', color: '#fbbf24', fontWeight: '700' }}>
-                  DMR
-                </span>
-              </div>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Hent automatisk bilmodel, forbrug og grøn ejerafgift
-              </p>
-            </div>
-          </div>
+  const showContent = alwaysOpen || isOpen;
 
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            style={{
-              background: isOpen ? 'rgba(255, 255, 255, 0.1)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#ffffff',
-              padding: '7px 12px',
-              fontSize: '0.75rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              boxShadow: isOpen ? 'none' : '0 2px 8px rgba(245, 158, 11, 0.3)'
-            }}
-          >
-            {isOpen ? 'Luk' : 'Slå op'}
-          </button>
-        </div>
+  return (
+    <div style={{ padding: alwaysOpen ? '0' : '0 16px' }}>
+      
+      {/* Container for Nummerpladeopslag */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.08) 0%, rgba(56, 189, 248, 0.06) 100%)',
+        border: '1px solid rgba(234, 179, 8, 0.25)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '16px'
+      }}>
+        {!alwaysOpen && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                background: 'rgba(234, 179, 8, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Car size={20} color="#fbbf24" />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#ffffff' }}>
+                    Slå din bil op på nummerplade
+                  </h3>
+                  <span style={{ fontSize: '0.65rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(234, 179, 8, 0.25)', color: '#fbbf24', fontWeight: '700' }}>
+                    DMR
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Hent automatisk bilmodel, forbrug og grøn ejerafgift
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              style={{
+                background: isOpen ? 'rgba(255, 255, 255, 0.1)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#ffffff',
+                padding: '7px 12px',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                boxShadow: isOpen ? 'none' : '0 2px 8px rgba(245, 158, 11, 0.3)'
+              }}
+            >
+              {isOpen ? 'Luk' : 'Slå op'}
+            </button>
+          </div>
+        )}
 
         {/* Udfoldet Nummerpladeopsalg Panel */}
-        {isOpen && (
-          <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        {showContent && (
+          <div style={{ marginTop: alwaysOpen ? '0' : '16px', paddingTop: alwaysOpen ? '0' : '14px', borderTop: alwaysOpen ? 'none' : '1px solid rgba(255, 255, 255, 0.1)' }}>
             
             {/* Realistisk Dansk Nummerplade Input */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
@@ -299,21 +309,58 @@ export default function LicensePlateLookup({ onApplyCar, activeTab, initialOpen 
                     background: result.car.type === 'ev' ? 'var(--ev-gradient)' : 'var(--petrol-gradient)',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: '10px',
+                    padding: '12px',
                     color: '#ffffff',
-                    fontSize: '0.85rem',
+                    fontSize: '0.88rem',
                     fontWeight: '800',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px',
+                    gap: '8px',
                     cursor: 'pointer',
-                    marginTop: '8px'
+                    marginTop: '8px',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.3)'
                   }}
                 >
-                  <CheckCircle2 size={16} />
-                  <span>Vælg {result.car.name} til beregneren</span>
+                  <CheckCircle2 size={18} />
+                  <span>Vælg {result.car.name} som aktiv {result.car.type === 'ev' ? 'elbil' : 'benzinbil'}</span>
                 </button>
+
+                {appliedMessage && (
+                  <div style={{
+                    marginTop: '10px',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: '#34d399',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '6px'
+                  }}>
+                    <span>{appliedMessage}</span>
+                    {onSwitchToCustom && (
+                      <button
+                        onClick={onSwitchToCustom}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.15)',
+                          border: 'none',
+                          borderRadius: '6px',
+                          color: '#ffffff',
+                          padding: '4px 8px',
+                          fontSize: '0.72rem',
+                          fontWeight: '800',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Finjuster tal ➔
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
